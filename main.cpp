@@ -37,10 +37,13 @@ char pass[] = "HakunaMatata";
 WiFiServer wifiServer(502); // Porta standard Modbus TCP è 502
 WiFiServer wifiWebServer(80);  // Server Web (porta 80)
 WiFiClient wifiWebClient; //client Web WiFi
+
+
 static WiFiClient modbusClient;
-
-
 ModbusTCPServer modbusTCPServer; // Creazione del server Modbus TCP (ethServer invece è il server Ethernet di base)
+
+//Creo oggetto rulliera
+Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer, modbusClient);
 
 bool wifiConnectionTest(char ssid[], char pass[]);
 bool ethConnectionTest(byte mac[], IPAddress ip);
@@ -95,7 +98,6 @@ void setup() {
 }
 
 void loop() {
-  Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer);
   Rulliera1.blisterCounter(SENSOR_PIN_2, SENSOR_PIN, LED_BUILTIN_2, connectionType);
 }
 
