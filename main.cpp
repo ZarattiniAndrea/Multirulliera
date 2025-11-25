@@ -43,7 +43,7 @@ static WiFiClient modbusClient;
 ModbusTCPServer modbusTCPServer; // Creazione del server Modbus TCP (ethServer invece è il server Ethernet di base)
 
 //Creo oggetto rulliera
-Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer, modbusClient);
+Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer, modbusClient, ethServer);
 
 bool wifiConnectionTest(char ssid[], char pass[]);
 bool ethConnectionTest(byte mac[], IPAddress ip);
@@ -133,7 +133,7 @@ bool ethConnectionTest(byte mac[], IPAddress ip){
       // Se otteniamo un IP valido, la connessione Ethernet è attiva
       Serial.print("Ethernet connessa, IP: ");
       Serial.println(Ethernet.localIP());
-      //avvio il server ethrenet
+      //avvio il server ethernet
       ethServer.begin();
       //avvio il server Web ethernet
       WebServer.begin();

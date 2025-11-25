@@ -10,8 +10,8 @@
 #include <FlashIAPBlockDevice.h>
 #include "webpage.h"
 
-Rulliera::Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient)
-    : SENSOR_PIN(sensorPin), SENSOR_PIN_2(sensorPin2), LED_PIN(ledPin), modbusTCPServer(mbServer), modbusClient(mbClient) {
+Rulliera::Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient, EthernetServer& ethServer)
+    : SENSOR_PIN(sensorPin), SENSOR_PIN_2(sensorPin2), LED_PIN(ledPin), modbusTCPServer(mbServer), modbusClient(mbClient), ethServer(ethServer) {
         pinMode(LED_PIN, OUTPUT);
         pinMode(SENSOR_PIN, INPUT);
         pinMode(SENSOR_PIN_2, INPUT);
@@ -117,14 +117,18 @@ void Rulliera::WriteDebounce(unsigned long debounceDelay){
 
 void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t OUTPUT_LED, bool connectionType){
   Serial.println("Avvio tracking blister...");
-  
+  Serial.println("Tipo di connessione: " + String(connectionType == 0 ? "Ethernet" : "WiFi"));
   if(connectionType == 0){ //ETHERNET
-    EthernetClient client = ethServer.available();
+    
+    if(!ethModbusClient || !ethModbusClient.connected()) {
+      //Se non c'è un client modbus attivo, ne accetto uno nuovo
+      EthernetClient client = ethServer.available();
 
-    if(client){
-      ethModbusClient = client;
-      modbusTCPServer.accept(ethModbusClient); // "passo" il server Ethernet al server Modbus TCP
-      Serial.println("Client Modbus connesso via Ethernet");
+      if(client){
+        ethModbusClient = client;
+        modbusTCPServer.accept(client); // "passo" il server Ethernet al server Modbus TCP
+        Serial.println("Client Modbus connesso via Ethernet");
+      }
     }
     
         //polling per le richieste Modbus mentre il client è connesso
@@ -179,7 +183,7 @@ void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t
         }
       WebClient.stop();
     }
-    client.stop(); // Chiudo la connessione con il client Modbus
+    //client.stop(); // Chiudo la connessione con il client Modbus
   }
 
   if(connectionType == 1){ //WIFI

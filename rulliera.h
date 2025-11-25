@@ -10,6 +10,7 @@
 
 class Rulliera {
     private: 
+        //SENSORI E STATO
         unsigned long contatore = 0; 
         int front_sensorstate = LOW;
         int front_precsensorstate = LOW;
@@ -19,22 +20,26 @@ class Rulliera {
         unsigned long debounceDelay = 200;
         bool front_state = false;
         bool back_state = false;
+        
+        //HARDWARE
         uint8_t SENSOR_PIN;
         uint8_t SENSOR_PIN_2;
         uint8_t LED_PIN;
+
+        //MODBUS E RETE
         ModbusTCPServer& modbusTCPServer;
-        WiFiClient& modbusClient;
         EthernetClient ethModbusClient;
-        EthernetServer ethServer = EthernetServer(502);
+        EthernetServer& ethServer;
         EthernetServer WebServer = EthernetServer(80);
         EthernetClient WebClient = EthernetClient();
+        WiFiClient& modbusClient;
         WiFiServer wifiServer = WiFiServer(502);
         WiFiServer wifiWebServer = WiFiServer(80);
         WiFiClient wifiWebClient = WiFiClient();
 
         
     public: 
-        Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient);
+        Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient, EthernetServer& ethServer);
         void rilevamento_anteriore(uint8_t SENSOR_PIN_2, uint8_t LED_BUILTIN_2);
         void rilevamento_posteriore(uint8_t SENSOR_PIN, uint8_t LED_BUILTIN_2);
         void backToggle();
