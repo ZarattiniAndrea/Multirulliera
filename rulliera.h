@@ -35,7 +35,7 @@ class Rulliera {
         WiFiClient& modbusClient;
         WiFiServer wifiServer = WiFiServer(502);
         WiFiServer wifiWebServer = WiFiServer(80);
-        WiFiClient wifiWebClient = WiFiClient();
+        WiFiClient wifiWebClient;
 
         
     public: 

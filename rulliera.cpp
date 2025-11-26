@@ -116,8 +116,7 @@ void Rulliera::WriteDebounce(unsigned long debounceDelay){
 }
 
 void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t OUTPUT_LED, bool connectionType){
-  Serial.println("Avvio tracking blister...");
-  Serial.println("Tipo di connessione: " + String(connectionType == 0 ? "Ethernet" : "WiFi"));
+  //Serial.println("Tipo di connessione: " + String(connectionType == 0 ? "Ethernet" : "WiFi"));
   if(connectionType == 0){ //ETHERNET
     
     if(!ethModbusClient || !ethModbusClient.connected()) {
@@ -137,6 +136,8 @@ void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t
     modbusTCPServer.coilWrite(0x00, front_state);
         //aggiorno il registro coil posteriore con lo stato del toggle
     modbusTCPServer.coilWrite(0x01, back_state);
+        //Stampo il valore del toggle sul monitor seriale
+    Serial.println("Valore dei toggle - Frontale: " + String(front_state) + " | Posteriore: " + String(back_state));
         //controllo i sensori
     rilevamento_anteriore(FRONT_SENSOR, OUTPUT_LED);
     rilevamento_posteriore(REAR_SENSOR, OUTPUT_LED);
@@ -242,4 +243,5 @@ void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t
       }
     }
   }
+  yield(); // Permette di mantenere il WiFi attivo
 }
