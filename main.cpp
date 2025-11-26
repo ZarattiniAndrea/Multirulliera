@@ -40,10 +40,11 @@ WiFiClient wifiWebClient; //client Web WiFi
 
 
 static WiFiClient modbusClient;
+EthernetClient ethModbusClient;
 ModbusTCPServer modbusTCPServer; // Creazione del server Modbus TCP (ethServer invece è il server Ethernet di base)
 
 //Creo oggetto rulliera
-Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer, modbusClient, ethServer);
+Rulliera Rulliera1 = Rulliera(SENSOR_PIN,SENSOR_PIN_2,LED_BUILTIN_2, modbusTCPServer, ethModbusClient, modbusClient, ethServer);
 
 bool wifiConnectionTest(char ssid[], char pass[]);
 bool ethConnectionTest(byte mac[], IPAddress ip);

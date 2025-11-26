@@ -10,8 +10,8 @@
 #include <FlashIAPBlockDevice.h>
 #include "webpage.h"
 
-Rulliera::Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient, EthernetServer& ethServer)
-    : SENSOR_PIN(sensorPin), SENSOR_PIN_2(sensorPin2), LED_PIN(ledPin), modbusTCPServer(mbServer), modbusClient(mbClient), ethServer(ethServer) {
+Rulliera::Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, EthernetClient& ethModbusClient, WiFiClient& mbClient, EthernetServer& ethServer)
+    : SENSOR_PIN(sensorPin), SENSOR_PIN_2(sensorPin2), LED_PIN(ledPin), modbusTCPServer(mbServer), ethModbusClient(ethModbusClient), modbusClient(mbClient), ethServer(ethServer) {
         pinMode(LED_PIN, OUTPUT);
         pinMode(SENSOR_PIN, INPUT);
         pinMode(SENSOR_PIN_2, INPUT);
@@ -126,7 +126,7 @@ void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t
 
       if(client){
         ethModbusClient = client;
-        modbusTCPServer.accept(client); // "passo" il server Ethernet al server Modbus TCP
+        modbusTCPServer.accept(ethModbusClient); // "passo" il server Ethernet al server Modbus TCP
         Serial.println("Client Modbus connesso via Ethernet");
       }
     }
@@ -206,40 +206,40 @@ void Rulliera::blisterCounter(uint8_t FRONT_SENSOR, uint8_t REAR_SENSOR, uint8_t
 
     if(wifiWebClient){
       Serial.println("Nuovo Client connesso");
-        String request = "";
-        boolean currentLineIsBlank = true; // Variabile per tenere traccia delle linee vuote
-        while(wifiWebClient.connected()){
-            if(wifiWebClient.available()){
-                char c = wifiWebClient.read(); // Leggo un carattere dal client
-                // Fine dell'header HTTP è indicata da una linea vuota
-                request += c;
-                if (c == '\n' && currentLineIsBlank) {
-                    // Invio della risposta HTTP
-                    wifiWebClient.println("HTTP/1.1 200 OK");
-                    wifiWebClient.println("Content-Type: text/html");
-                    wifiWebClient.println("Connection: close");
-                    wifiWebClient.println();
-                    wifiWebClient.println(generateHTML(debounceDelay));
-                    break;
-                }
-                if (c == '\n') {
-                    currentLineIsBlank = true; // Inizio di una nuova linea
-                } else if (c != '\r') {
-                    currentLineIsBlank = false; // Carattere diverso da '\r', quindi la linea non è vuota
-                }
-                if(request.indexOf("GET /?debounce=") >= 0){
-                  auto precdebounceDelay = debounceDelay;
-                  int startIndex = request.indexOf("debounce=") + 9;
-                  int endIndex = request.indexOf(" ", startIndex); //trovo lo spazio dopo il valore
-                  String debounceValueStr = request.substring(startIndex, endIndex);
-                  debounceDelay = debounceValueStr.toInt();
-                  Serial.print("Nuovo valore di debounceDelay: ");
-                  Serial.println(debounceDelay);
-                  
-                  if(debounceDelay != precdebounceDelay) WriteDebounce(debounceDelay);
-                }
-            }
+      String request = "";
+      boolean currentLineIsBlank = true; // Variabile per tenere traccia delle linee vuote
+      while(wifiWebClient.connected()){
+        if(wifiWebClient.available()){
+          char c = wifiWebClient.read(); // Leggo un carattere dal client
+          // Fine dell'header HTTP è indicata da una linea vuota
+          request += c;
+          if (c == '\n' && currentLineIsBlank) {
+              // Invio della risposta HTTP
+              wifiWebClient.println("HTTP/1.1 200 OK");
+              wifiWebClient.println("Content-Type: text/html");
+              wifiWebClient.println("Connection: close");
+              wifiWebClient.println();
+              wifiWebClient.println(generateHTML(debounceDelay));
+              break;
+          }
+          if (c == '\n') {
+              currentLineIsBlank = true; // Inizio di una nuova linea
+          } else if (c != '\r') {
+              currentLineIsBlank = false; // Carattere diverso da '\r', quindi la linea non è vuota
+          }
+          if(request.indexOf("GET /?debounce=") >= 0){
+            auto precdebounceDelay = debounceDelay;
+            int startIndex = request.indexOf("debounce=") + 9;
+            int endIndex = request.indexOf(" ", startIndex); //trovo lo spazio dopo il valore
+            String debounceValueStr = request.substring(startIndex, endIndex);
+            debounceDelay = debounceValueStr.toInt();
+            Serial.print("Nuovo valore di debounceDelay: ");
+            Serial.println(debounceDelay);
+            
+            if(debounceDelay != precdebounceDelay) WriteDebounce(debounceDelay);
+          }
         }
+      }
     }
   }
 }

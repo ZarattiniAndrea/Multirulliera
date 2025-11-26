@@ -39,7 +39,7 @@ class Rulliera {
 
         
     public: 
-        Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, WiFiClient& mbClient, EthernetServer& ethServer);
+        Rulliera(uint8_t sensorPin, uint8_t sensorPin2, uint8_t ledPin, ModbusTCPServer& mbServer, EthernetClient& ethModbusClient, WiFiClient& mbClient, EthernetServer& ethServer);
         void rilevamento_anteriore(uint8_t SENSOR_PIN_2, uint8_t LED_BUILTIN_2);
         void rilevamento_posteriore(uint8_t SENSOR_PIN, uint8_t LED_BUILTIN_2);
         void backToggle();
